@@ -30,6 +30,48 @@ When you're done thinking, you can hand the whole stack of decisions to an AI co
 
 ---
 
+## Questions you didn't know you needed to answer
+
+You said "food truck." It came back with:
+
+> **Do you optimize for speed or for crave factor?**
+>
+> Option A: **Speed Machine** - 3 items, all under 4 minutes. You'll crush the lunch rush but nobody's posting about it on Instagram.
+>
+> Option B: **Crave Monster** - 6 items, made to order. Longer wait, but people will drive across town for it.
+>
+> Option C: **The Hybrid** - 3 fast items for lunch, expanded menu for evening brewery stops.
+>
+> Option D: **Rotating Special** - Small fixed menu plus one daily wildcard that keeps regulars coming back.
+
+You said "wedding." It came back with:
+
+> **What's the emotional arc of the evening?**
+>
+> Option A: **Slow Build** - Intimate ceremony, cocktail hour, dinner, then the dance floor erupts. Classic for a reason.
+>
+> Option B: **Peak Early** - Big emotional ceremony, then a long relaxed dinner party. For people who want tears at 4pm and laughter at 9pm.
+>
+> Option C: **Party From the Start** - Short ceremony, straight into music and food. No lull, no awkward in-between.
+>
+> Option D: **Two Acts** - Formal first half, then a complete vibe shift: new room, new music, late-night food. Guests remember the surprise.
+
+You said "tool-sharing app." It came back with:
+
+> **What happens when something comes back broken?**
+>
+> Option A: **Trust System** - Borrower self-reports, community reputation handles the rest. Low friction, but relies on honesty.
+>
+> Option B: **Deposit Hold** - Pre-authorized charge that only hits if there's a dispute. Feels like renting, but everyone's protected.
+>
+> Option C: **Photo Check-in** - Borrower photos the tool before and after. Visual proof, no money involved. Lightweight but effective.
+>
+> Option D: **Community Fund** - Everyone chips in $2/month. Breakage comes out of the pool. Nobody points fingers. Very co-op energy.
+
+You're not writing essays in a text box. You're looking at four well-framed options, each with a real point of view, and picking the one that fits. Or combining two. Or telling it to throw them all out and start over. The thinking is done for you. The judgment is all yours.
+
+---
+
 ## Contents
 
 - [The separation that matters](#the-separation-that-matters)

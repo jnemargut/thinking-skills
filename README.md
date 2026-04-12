@@ -246,6 +246,8 @@ Decisions mature: early sketch (no reasoning) becomes firmed up (has reasoning) 
 
 ## What you can use this for
 
+These are just a handful of examples. Anywhere you need to make thoughtful decisions before committing to a direction, Decision Kit has a place. The pattern is always the same: you bring the situation, AI surfaces the decisions, you judge.
+
 **In software:**
 
 - **Prototype from scratch** - "I have an idea for an app" turns into a strategy brief, design decisions, and implementation plan before you write a line of code. Then you hand the decisions to an AI coding tool and what comes out actually makes sense.

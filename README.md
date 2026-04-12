@@ -8,7 +8,7 @@ Here's the thing people get wrong about AI: they say "don't outsource the thinki
 
 But the other kind of thinking? The grunt work of exploring four pricing models, visualizing them, comparing them across six dimensions, pulling together context you'd otherwise spend a week assembling? AI can do that in two minutes. You can't. I can't. Nobody can. And there's no reason to pretend otherwise.
 
-So the real move isn't "don't outsource the thinking." It's outsource the legwork, keep the critical thinking. Let AI do the work around the decision so you can do the part that actually matters: looking at four options and saying "this one, because it fits who we are." That's judgment. And judgment is yours.
+That's the separation that matters. AI does the work around the decision so you can do the part that actually requires you: looking at four options and saying "this one, because it fits who we are." That's judgment. And judgment is yours.
 
 Decision Kit is a system that makes that separation clean. AI does all the work *around* the decision - the exploration, the options, the visual comparisons, the tradeoffs. Then it stops and waits for you to make the call. Every decision gets a beautiful visual page you can actually look at and compare. You pick. It remembers. The next decision builds on the last one.
 

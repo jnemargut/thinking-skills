@@ -150,10 +150,10 @@ Examples: "Make the buttons bigger" • "What framework should we use" • "Desi
 
 ```
 /visual-design
-Does: Post-step aesthetic thinking for an existing HTML artifact. Walks through 5 decisions (tradition, color, type, mood, signature flourish) and rewrites the artifact's style block. Non-destructive — writes <name>.styled.html alongside the original, plus a .visual-design/tokens.json sidecar the project remembers. 30 aesthetic traditions, 10 flourishes.
-Signals: "make it pretty", "re-skin", "restyle", "make this look better", "apply a different aesthetic", "ugly output", "looks generic", "needs a visual pass", "change the visual style", has an existing HTML file + wants it to look different, post-skill cleanup, "the output from /strategize/game-plan/etc looks bad"
-Not this if: user is making product-level visual decisions for something not yet built (that's /product-design), user wants to build/produce a new HTML artifact from scratch (that's /strategize, /product-design, etc.), user wants to challenge their decisions (that's /challenge)
-Examples: "Make my strategy brief look nicer" • "Re-skin this HTML" • "Apply an editorial aesthetic to brief.html" • "My game-plan output looks generic — fix the visuals"
+Does: Post-step aesthetic thinking for an existing HTML artifact OR SVG asset. HTML: 5 decisions (tradition, color, type, mood, signature flourish). SVG: 3 decisions (tradition, stroke weight, color). Rewrites the file's style/attributes. Non-destructive — writes <name>.styled.html or <name>.styled.svg alongside the original, plus .visual-design/tokens.json the project remembers. 30 aesthetic traditions.
+Signals: "make it pretty", "re-skin", "restyle", "make this look better", "apply a different aesthetic", "ugly output", "looks generic", "needs a visual pass", "change the visual style", "make this icon pretty", "restyle this SVG", "different stroke weight", "make my icons consistent", has an existing HTML or SVG file + wants it to look different, post-skill cleanup, "the output from /strategize/game-plan/etc looks bad"
+Not this if: user is making product-level visual decisions for something not yet built (that's /product-design), user wants to build/produce a new HTML artifact from scratch (that's /strategize, /product-design, etc.), user wants to challenge their decisions (that's /challenge), user wants to restyle a PNG/JPG raster image (not supported — vector/style only)
+Examples: "Make my strategy brief look nicer" • "Re-skin this HTML" • "Apply an editorial aesthetic to brief.html" • "Make this icon pretty" • "Apply a Brutalist look to download.svg" • "My game-plan output looks generic — fix the visuals"
 ```
 
 ```

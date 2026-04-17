@@ -1,51 +1,58 @@
 ---
 name: visual-design
-description: Re-skin any existing HTML artifact with a chosen aesthetic. Post-step aesthetic thinking — walks through 5 decisions (tradition, color, type, mood, signature flourish) and produces a side-by-side beautified HTML + tokens.json sidecar. Use AFTER producing an HTML artifact from another thinking skill (strategize, game-plan, better-proposal, launch-playbook, product-design) that looks visually generic, or any time you want to re-style an HTML file without rewriting its structure.
+description: Re-skin any existing HTML artifact OR SVG asset with a chosen aesthetic. Post-step aesthetic thinking. For HTML: walks through 5 decisions (tradition, color, type, mood, signature flourish) and rewrites the style block. For SVG icons/illustrations: walks through 3 decisions (tradition, stroke weight, color) and rewrites the stroke/fill attributes. Produces a side-by-side styled file + tokens.json sidecar. Use AFTER producing an artifact that looks visually generic — output from another thinking skill (strategize, game-plan, better-proposal, launch-playbook, product-design), an existing HTML page, or a raw SVG icon.
 ---
 
 # Visual Design
 
-You are helping the user re-skin an existing HTML artifact with a distinct aesthetic. This is a post-step skill: something else produced the HTML; your job is to make it feel like *something*, not a generic template.
+You are helping the user re-skin an existing artifact with a distinct aesthetic. This is a post-step skill: something else produced the artifact; your job is to make it feel like *something*, not a generic template.
 
-The user invokes `/visual-design [optional path to .html]`. You walk them through five quick decisions — **Tradition → Color → Type → Mood → Signature Flourish** — then rewrite the artifact's `<style>` block with the resolved aesthetic. Original is preserved; a new `<name>.styled.html` is written alongside, and `.visual-design/tokens.json` captures the decisions for reuse in the project.
+The skill supports two modes based on the input file:
+- **HTML mode** (`.html` input) — 5-step flow: **Tradition → Color → Type → Mood → Signature Flourish**. Rewrites the `<style>` block.
+- **SVG mode** (`.svg` input) — 3-step flow: **Tradition → Stroke → Color**. Rewrites stroke/fill attributes on paths. For icons, logos, and illustrations.
+
+The user invokes `/visual-design [optional path to .html or .svg]`. Original is preserved; a new `<name>.styled.html` or `<name>.styled.svg` is written alongside, and `.visual-design/tokens.json` captures the decisions for reuse in the project.
 
 **Core principles:**
 - Write in plain English. Talk like a designer who cares, not a form-builder.
 - Each decision presents exactly 4 options *except* Tradition (top 3 matched + 20+ catalog) and Flourish (top 3 curated + library) — those use name-based picking.
 - Always include a recommendation.
 - Show, don't just tell — every option renders a preview using the actual tradition's tokens.
-- The skill's job ends when `<name>.styled.html` and `tokens.json` are on disk and opened for the user.
+- The skill's job ends when the styled file and `tokens.json` are on disk and opened for the user.
 
 ---
 
 ## PHASE 1 — Invocation
 
-### Step 1a — Parse the argument
+### Step 1a — Parse the argument + detect mode
 
 The user invokes `/visual-design [path]` where `[path]` is optional.
 
 **If a path is provided:**
-- Verify the file exists and ends in `.html`.
-- If valid, set `TARGET = the path`, proceed to Phase 2.
-- If invalid (not found, not HTML), tell the user and fall through to the picker path below.
+- Verify the file exists.
+- Branch on extension:
+  - `.html` → set `MODE = "html"`, `TARGET = path`, proceed to Phase 2.
+  - `.svg` → set `MODE = "svg"`, `TARGET = path`, proceed to Phase 2.
+  - `.png` / `.jpg` / `.jpeg` / `.webp` → tell the user rasters aren't supported (the skill rewrites vector/style, not pixels). Suggest they convert to SVG or provide an HTML wrapper. Stop.
+  - Any other extension → tell the user and fall through to the picker path below.
 
 **If no path is provided:**
-- Glob for recent HTML artifacts in priority order:
+- Glob for recent styleable artifacts in priority order:
   1. `.decisions/*.html` (most common — decision-kit outputs)
-  2. `*.html` in cwd
-  3. `**/*.html` up to 2 levels deep (excluding `node_modules`, `dist`, `.git`)
+  2. `*.{html,svg}` in cwd
+  3. `**/*.{html,svg}` up to 2 levels deep (excluding `node_modules`, `dist`, `.git`)
 - Sort results by modification time (newest first).
-- If 0 matches: tell the user no HTML artifacts found, suggest running a thinking skill first or passing a path. Stop.
+- If 0 matches: tell the user no artifacts found, suggest running a thinking skill first or passing a path. Stop.
 - If 1 match: use it, but confirm with user first:
   > "Found **[filename]** (modified [time ago]). Re-skin this one? Reply `yes` or pass a different path."
 - If 2+ matches: show the top 5 with the newest marked ✓:
-  > "Found these HTML artifacts. Which one do you want to re-skin?
+  > "Found these artifacts. Which one do you want to re-skin?
   >   1. ✓ strategy-brief.html   (2 min ago)
-  >   2. proposal.html            (1 hr ago)
-  >   3. launch-plan.html         (yesterday)
+  >   2. icon-download.svg        (1 hr ago)
+  >   3. proposal.html            (yesterday)
   > Reply with a number, a filename, or paste a different path."
 
-Wait for the user to confirm the target before proceeding.
+Once confirmed, set `MODE` from the extension. Wait for confirmation before proceeding.
 
 ### Step 1b — Check for project memory
 
@@ -56,7 +63,9 @@ Once `TARGET` is set, check for `.visual-design/tokens.json` at the project root
 
 ### Step 1c — Create `.decisions/` working directory for this run
 
-Create `.decisions/visual-design/` at the project root. This is where per-step HTML decision pages for this invocation go:
+Create `.decisions/visual-design/` at the project root. Per-step decision pages for this invocation go here.
+
+**HTML mode output:**
 - `01-tradition.html`
 - `02-color.html`
 - `03-type.html`
@@ -64,11 +73,21 @@ Create `.decisions/visual-design/` at the project root. This is where per-step H
 - `05-flourish.html`
 - `index.html` (run summary)
 
+**SVG mode output:**
+- `01-tradition.html`
+- `02-stroke.html`
+- `03-color.html`
+- `index.html` (run summary)
+
 These let the user revisit their aesthetic decisions later.
 
 ---
 
 ## PHASE 2 — Artifact Analysis
+
+Analysis branches on `MODE`.
+
+### Phase 2 — HTML mode
 
 Read the target HTML file. Extract:
 
@@ -92,6 +111,7 @@ Keep this as a data structure you reference throughout the run. Example:
 ```json
 {
   "target": ".decisions/strategy-brief.html",
+  "mode": "html",
   "type": "brief",
   "wordCount": 2400,
   "headings": { "h1": 1, "h2": 6, "h3": 3 },
@@ -100,6 +120,42 @@ Keep this as a data structure you reference throughout the run. Example:
   "selectors": [".page", ".option", ".footer", ".research", "h1.title", ".deck", "..."]
 }
 ```
+
+### Phase 2 — SVG mode
+
+Read the target SVG file. Extract:
+
+1. **ViewBox and dimensions** — `viewBox`, `width`, `height` attributes on the root `<svg>` element.
+2. **Shape inventory** — count of `<path>`, `<circle>`, `<rect>`, `<line>`, `<polygon>`, `<polyline>`, `<ellipse>`. Note which primitives dominate.
+3. **Current styling:**
+   - Existing `stroke` and `fill` attributes on shapes (and inside inline `style="..."`)
+   - Existing `stroke-width` values
+   - Any embedded `<style>` tag inside the SVG
+   - Any `<defs>` (gradients, filters, patterns) that will need to be updated or preserved
+4. **Color count** — how many distinct colors are used? (1 = single-color, 2-3 = duotone/limited, 4+ = multi-color illustration)
+5. **Infer asset type** — one of:
+   - `icon` — small viewBox (≤64), 1-2 colors, outline-style (no fill or single fill)
+   - `logo` — small-medium viewBox, branded colors, mixed stroke/fill
+   - `illustration` — larger viewBox, 4+ colors, complex shapes
+   - `glyph` — path-only, single color, no stroke (text-like)
+
+Example:
+
+```json
+{
+  "target": "icons/download.svg",
+  "mode": "svg",
+  "type": "icon",
+  "viewBox": "0 0 24 24",
+  "shapes": { "path": 3, "circle": 0, "rect": 0 },
+  "colorCount": 1,
+  "currentStroke": "currentColor",
+  "currentFill": "none",
+  "currentStrokeWidth": "2"
+}
+```
+
+**Warn the user** if `type === "illustration"` and they've picked a tradition with single-color rules — multi-color illustrations may lose detail when flattened to a tradition's palette.
 
 ---
 
@@ -113,12 +169,23 @@ For each tradition in the library (see AESTHETIC TRADITIONS LIBRARY below), comp
 
 | Artifact type | Tradition affinities (highest fit first) |
 |---------------|------------------------------------------|
-| `brief` | Editorial Print, Warm Minimal, Academic, Newsprint, Japandi, Neo-Classical, Botanical Herbarium, Swiss Modern |
-| `landing` | Neo-Brutalist, Kinetic Modern, Glassmorphic, Playful Maximalist, Y2K Maximalist, Memphis Revival, Retro Futurism, Swiss Modern |
-| `doc` | Technical Documentary, Swiss Modern, Monochrome, Academic, Dashboard Operator, Newsprint |
-| `proposal` | Editorial Print, Neo-Classical, Swiss Modern, Warm Minimal, Luxury Serif, Midnight Marine, Art Deco |
-| `dashboard` | Swiss Modern, Technical Documentary, Dashboard Operator, Kinetic Modern, Monochrome, Neon Terminal |
-| `slide` | Editorial Print, Neo-Brutalist, Luxury Serif, Kinetic Modern, Art Deco, Bauhaus Grid, Zine |
+| `brief` (HTML) | Editorial Print, Warm Minimal, Academic, Newsprint, Japandi, Neo-Classical, Botanical Herbarium, Swiss Modern |
+| `landing` (HTML) | Neo-Brutalist, Kinetic Modern, Glassmorphic, Playful Maximalist, Y2K Maximalist, Memphis Revival, Retro Futurism, Swiss Modern |
+| `doc` (HTML) | Technical Documentary, Swiss Modern, Monochrome, Academic, Dashboard Operator, Newsprint |
+| `proposal` (HTML) | Editorial Print, Neo-Classical, Swiss Modern, Warm Minimal, Luxury Serif, Midnight Marine, Art Deco |
+| `dashboard` (HTML) | Swiss Modern, Technical Documentary, Dashboard Operator, Kinetic Modern, Monochrome, Neon Terminal |
+| `slide` (HTML) | Editorial Print, Neo-Brutalist, Luxury Serif, Kinetic Modern, Art Deco, Bauhaus Grid, Zine |
+| `icon` (SVG) | Swiss Modern, Monochrome, Neo-Brutalist, Technical Documentary, Neon Terminal, Cyberpunk Neon, Dashboard Operator, Bauhaus Grid |
+| `logo` (SVG) | Swiss Modern, Neo-Brutalist, Art Deco, Luxury Serif, Bauhaus Grid, Retro Futurism, Monochrome |
+| `illustration` (SVG) | Warm Handmade, Sketchbook, Botanical Herbarium, Editorial Print, Memphis Revival, Kraft Paper, Playful Maximalist |
+| `glyph` (SVG) | Monochrome, Swiss Modern, Neo-Brutalist, Art Deco, Luxury Serif, Academic |
+
+**SVG-incompatible traditions** (warn user if they pick one for an SVG):
+- **Glassmorphic** — requires backdrop-filter + layered translucency, meaningless on single-shape icons
+- **Playful Maximalist** — gradients-as-default need careful per-shape handling, best for illustrations only
+- **Anti-Design** — clashing-font premise doesn't apply to vectors without text
+
+If the user picks one of these in SVG mode, offer a gentle "are you sure? here's what will change" note rather than blocking. The tradition will still resolve (color palette at least).
 
 Top 3 scores become the featured matches. If project memory exists, slot the previous tradition as suggestion #1 regardless of score (with the "your project aesthetic" label).
 
@@ -149,7 +216,15 @@ Once locked: set `TRADITION` in state, proceed to Step 2 (Color).
 
 ---
 
-## PHASE 4 — Steps 2-5 of the Flow
+## PHASE 4 — Remaining Steps
+
+The flow branches on `MODE`:
+- **HTML mode** → 4 remaining steps (Color, Type, Mood, Signature Flourish), all A/B/C/D
+- **SVG mode** → 2 remaining steps (Stroke, Color), all A/B/C/D
+
+---
+
+## PHASE 4 (HTML mode) — Steps 2-5
 
 All four of these steps use the **A/B/C/D pattern** (standard thinking-skill convention). Each step:
 1. Generates a decision HTML page with 4 options
@@ -207,7 +282,58 @@ Write `.decisions/visual-design/05-flourish.html`. Open. Wait.
 
 ---
 
+## PHASE 4 (SVG mode) — Steps 2-3
+
+Two remaining steps after Tradition. Both use A/B/C/D.
+
+### Step 2 — Stroke Weight
+
+Pull the tradition's default stroke weight preference and offer 4 options calibrated around it. For a tradition whose rule specifies "1.5px stroke" (Swiss), the range might be 1 / 1.5 / 2 / 3. For Neo-Brutalist, 2 / 3 / 4 / 6.
+
+General pattern:
+
+- **Option A: Thin** — hairline, precise. Good for dense icon sets and reading-context icons.
+- **Option B: Regular** — the tradition's default stroke width (recommended).
+- **Option C: Bold** — stepped up one level, more presence.
+- **Option D: Very Bold** — aggressive, chunky. Sets the icon apart. Default for Neo-Brutalist, Y2K, Anti-Design.
+
+Render each option as a small grid of 3-4 icon primitives (chevron, plus, check, circle) drawn in the tradition's colors at that stroke width. User sees how each weight reads at typical icon size.
+
+Also apply the tradition's stroke-linecap and stroke-linejoin preference:
+- Most traditions → `round` for linecap + linejoin
+- Swiss Modern, Bauhaus, Monochrome, Technical, Dashboard → `square` / `miter`
+- Neo-Brutalist → `square` + thick miter join
+- Neon Terminal, Cyberpunk → `square` with glow filter
+
+Write `.decisions/visual-design/02-stroke.html`. Open. Wait.
+
+### Step 3 — Color
+
+Given `TRADITION` + `STROKE`, offer 4 color treatments:
+
+- **Option A: Faithful palette** — apply the tradition's accent color as stroke/fill (e.g., Editorial's `#9a3412` brick, Cyberpunk's `#ff006e` neon).
+- **Option B: Monochrome** — single color, typically the tradition's ink (e.g., Editorial's `#1f1611`, Swiss's `#0f172a`). Most versatile for icon sets — inherits from surrounding text color if set to `currentColor`.
+- **Option C: Single accent** — stroke in the tradition's brightest accent, with no fill. Best for call-to-action icons.
+- **Option D: Duotone** — two colors on different paths/shapes. Stroke in accent, fill in a secondary tone. Requires 2+ shapes in the SVG to make sense — if the SVG has only 1 path, grey out this option.
+
+Each preview renders the same test icon with each color treatment applied so the user can see the difference directly.
+
+**Special case — SVG uses `currentColor`:** If the input SVG already uses `currentColor` for stroke (common in icon libraries like Lucide, Heroicons), Option B should preserve that. Include a 5th-line note: "Detected `currentColor` — Option B keeps it inheritable."
+
+Write `.decisions/visual-design/03-color.html`. Open. Wait.
+
+---
+
 ## PHASE 5 — Rewrite & Output
+
+Branches on `MODE`.
+
+**HTML mode** — Steps 5a–5e below (existing flow).
+**SVG mode** — Steps 5s-a through 5s-d (new, after the HTML section).
+
+---
+
+### Phase 5 (HTML mode)
 
 Once all 5 decisions are locked, you have:
 
@@ -311,6 +437,119 @@ Report:
 > - `change [tradition|color|type|mood|flourish]` → rerun just that step
 > - `different flourish` → return to step 5
 > - `more contrast` / `warmer` / etc → I'll interpret and adjust"
+
+---
+
+### Phase 5 (SVG mode)
+
+Once all 3 decisions are locked, you have:
+
+- `TRADITION` — aesthetic rules (stroke-linecap, linejoin, filter needs)
+- `STROKE` — stroke-width value
+- `COLOR` — resolved stroke + fill values (faithful / mono / accent / duotone)
+
+### Step 5s-a — Resolve SVG attributes
+
+Derive the exact attribute values to apply to each shape:
+
+```json
+{
+  "mode": "svg",
+  "tradition": "Editorial Print",
+  "variant": { "stroke": "regular", "color": "monochrome" },
+  "svg": {
+    "strokeWidth": "1.5",
+    "stroke": "#1f1611",
+    "fill": "none",
+    "strokeLinecap": "round",
+    "strokeLinejoin": "round",
+    "filter": null
+  },
+  "rootAttributes": {
+    "width": "24",
+    "height": "24",
+    "viewBox": "0 0 24 24",
+    "fill": "none",
+    "stroke": "currentColor",
+    "stroke-width": "1.5",
+    "stroke-linecap": "round",
+    "stroke-linejoin": "round"
+  }
+}
+```
+
+For traditions with a signature filter (Cyberpunk Neon, Neon Terminal), generate an SVG `<filter>` element to embed under `<defs>`. Example for Neon Terminal's phosphor glow:
+
+```xml
+<defs>
+  <filter id="vd-glow" x="-50%" y="-50%" width="200%" height="200%">
+    <feGaussianBlur stdDeviation="1.5" result="blur"/>
+    <feMerge>
+      <feMergeNode in="blur"/>
+      <feMergeNode in="SourceGraphic"/>
+    </feMerge>
+  </filter>
+</defs>
+```
+
+Then apply `filter="url(#vd-glow)"` to grouped shapes.
+
+### Step 5s-b — Rewrite the SVG
+
+The strategy: **hoist common attributes to the root `<svg>` element**, then **remove redundant per-shape attributes**. This keeps the output clean and makes the SVG easy to re-theme later.
+
+1. **Set root attributes** on `<svg>` itself:
+   - `stroke`, `fill`, `stroke-width`, `stroke-linecap`, `stroke-linejoin`
+   - Keep existing `viewBox`, `width`, `height`
+   - Preserve `xmlns`
+
+2. **Strip old styling** from every shape (`<path>`, `<circle>`, etc.):
+   - Remove `style="..."` attributes
+   - Remove per-shape `stroke`, `fill`, `stroke-width` UNLESS the color treatment is `duotone` and this shape is the "accent" layer — then keep its override.
+
+3. **Duotone handling**:
+   - For multi-shape SVGs with duotone: the first half of shapes (or all "filled" shapes) get `fill="var(--accent)"` + `stroke="none"`; the second half get `stroke="var(--ink)"` + `fill="none"`. Tune per SVG inspection.
+   - Single-path SVGs can't express duotone — fall back to accent.
+
+4. **Filter injection** (if tradition requires one):
+   - Add `<defs>` with the filter after `<svg>` opening
+   - Add `filter="url(#vd-glow)"` to either the root `<g>` wrapper OR individual shapes
+
+5. **Add a CSS comment header** inside `<svg>` as a text annotation for discoverability:
+   ```xml
+   <!-- /visual-design · Editorial Print · 1.5px · monochrome -->
+   ```
+
+6. **Preserve everything else** untouched — `<title>`, `<desc>`, `<metadata>`, comments, id attributes, aria attributes.
+
+### Step 5s-c — Write output files
+
+1. Write the rewritten SVG to `<original-basename>.styled.svg` in the same directory as the original.
+2. Write tokens to `.visual-design/tokens.json` at the project root (shared with HTML mode — same file, tokens now may include an `svg` field alongside the usual ones).
+3. Write run metadata to `.visual-design/run.json` (target, mode, decisions, timestamp).
+4. Add `.visual-design/` to `.gitignore` if missing.
+
+### Step 5s-d — Open + report
+
+Open both files side by side (browsers render SVGs directly):
+```bash
+open <original>
+open <original-basename>.styled.svg
+```
+
+Report:
+> "Re-skinned! **[basename].styled.svg** is open alongside the original.
+>
+> Applied **[Tradition]** at **[Stroke]px** in **[Color treatment]**. Decisions saved to `.visual-design/tokens.json`.
+>
+> Reply:
+> - `love it` → done
+> - `redo` → rerun the flow
+> - `change [tradition|stroke|color]` → rerun just that step
+> - `more stroke weight` / `different color` → I'll interpret and adjust
+> - `apply to other SVGs in this folder` → batch-apply the same aesthetic to sibling .svg files"
+
+**Batch mode (bonus):** if the user invokes `/visual-design` again in the same project and another `.svg` is detected, default to applying the project's saved tokens directly (skip the flow) unless they say otherwise. This makes consistent icon sets trivial.
 
 ---
 
@@ -1437,15 +1676,25 @@ Mirror the decision-hub style used elsewhere in the decision-kit (serif display,
 
 **Target file is HTML with embedded `<script>`:** Preserve all scripts. The skill only touches styles and minimal DOM for flourish hooks.
 
-**Target file is already a `.styled.html`:** Ask if the user wants to re-skin it (changing aesthetic) or start over (forgetting the prior aesthetic). If re-skin: use the existing `.styled.html` as the source, write a new `<name>.styled.html` overwriting prior styled version, update tokens.json.
+**Target file is already a `.styled.html` / `.styled.svg`:** Ask if the user wants to re-skin it (changing aesthetic) or start over (forgetting the prior aesthetic). If re-skin: use the existing styled file as the source, write a new `<name>.styled.*` overwriting prior styled version, update tokens.json.
+
+**Target file is a PNG/JPG raster:** The skill can't re-style pixels. Tell the user: "I can't restyle raster images — this skill rewrites vector/style. If this is an icon, see if you have the source SVG. If it's a photo, it's out of scope."
+
+**SVG is a multi-color illustration (4+ colors):** Warn the user before Phase 4 starts: "This looks like a multi-color illustration. If you pick a tradition with a single-color rule (most), colors will flatten. Traditions built for illustrations: Warm Handmade, Sketchbook, Botanical Herbarium, Editorial Print. Continue anyway?"
+
+**SVG has `<defs>` with gradients/patterns:** Preserve them. The rewrite only touches stroke/fill on rendered shapes, not referenced `url(#foo)` paint servers — unless the chosen tradition explicitly replaces them (e.g., Y2K Maximalist overriding gradients with its own chrome gradient).
+
+**SVG uses `currentColor`:** Honor it. Monochrome color treatment (Option B in SVG Step 3) should preserve `currentColor` so the icon inherits from its context. Note this on the decision page.
+
+**SVG has only one path:** Grey out the Duotone color option (D) since it needs 2+ shapes.
 
 **Tradition not found (typo):** Show 3 closest matches numbered, ask which.
 
-**User says `redo` after the output:** Delete the `.styled.html`, re-run from Phase 1 with the same target.
+**User says `redo` after the output:** Delete the `.styled.*` file, re-run from Phase 1 with the same target.
 
 **User says `change [step]`:** Jump to that step's decision page, re-run from there. Downstream choices stay unless they conflict.
 
-**No artifact type detected confidently:** Use `brief` as the fallback for type inference.
+**No artifact type detected confidently:** Use `brief` (HTML) or `icon` (SVG) as the fallback for type inference.
 
 ---
 

@@ -327,7 +327,29 @@ This library is the skill's aesthetic vocabulary. When the skill reaches a visua
 
 4. **Once a tradition is chosen, every downstream decision inherits it.** Component decisions, IA decisions, interaction flow decisions — all pull from the chosen tradition's tokens. Read `decisions.json` at the start of any visual/IA/interaction/component decision to check whether a tradition was chosen in decision-001 (or wherever the visual-direction decision lived) and apply it.
 
-5. **Sense current trends (optional).** Before presenting visual-direction options, you may use WebSearch with queries like "current product aesthetic trends 2026" or "emerging UI design directions" to sense what's shifting. Use what you learn to subtly modernize the library's defaults (a slightly shifted accent hue, an updated type weight preference). Do NOT introduce specific brand or product references into the options you present — keep the vocabulary neutral and tradition-based.
+5. **Calibrate with current references.** The library is a stable grammar; the web is a current vocabulary. Combining them keeps the kit from aging.
+
+   **When:** After a tradition is locked in the visual-direction decision (and only if no existing design system was detected in Step 1c).
+
+   **How:** Fire 1-2 `WebSearch` queries targeting current examples of the locked tradition:
+   - `"<tradition name> web design 2026 examples"`
+   - `"<tradition name> <product type> current trends"` (e.g., "editorial SaaS landing page current trends")
+
+   From the results, extract 1-3 concrete calibration signals:
+   - **Shifted accent hue** (trending warmer/cooler/more saturated)
+   - **Updated font weight or pairing**
+   - **Trending treatment or signature move**
+
+   Store as `CALIBRATION` in `decisions.json`. Apply to downstream decisions:
+   - **Visual-adjacent decisions** (card design, component design, color refinements): offer a "2026 current" variant alongside the library default. Label clearly: "Pulled from current [tradition] examples on the web."
+   - **Rendering previews:** the calibration's shifted accent can show up in the full-app-frame previews for downstream decisions so the user sees the calibrated aesthetic applied consistently.
+
+   **Skip this step if:**
+   - Web is unavailable
+   - Tradition is intentionally era-specific (Art Deco, Academic, Neon Terminal — these are stable by definition)
+   - User said `use library defaults` or `skip calibration`
+
+   Don't add more than ~5 seconds of latency. One search, extract, move on. Never introduce specific brand or product references into the options you present — the calibration is a nudge to the library's own vocabulary, not a reference to [brand X].
 
 6. **Handoff to /visual-design when a user wants deeper aesthetic work.** This library is enough to pick a direction and keep downstream decisions coherent. It is NOT a full aesthetic system. If a user says things like "I want more control over the look," "the tradition feels generic," "let's refine the aesthetic," or reaches the end of the flow and wants to polish the output — tell them: "The /visual-design skill takes it deeper — 30 traditions, stroke/flourish decisions, and per-artifact re-skinning. Run it on any HTML or SVG you've produced." Don't route automatically; just mention it when the intent shows up.
 

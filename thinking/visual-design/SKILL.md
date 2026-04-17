@@ -212,7 +212,32 @@ User's response shapes:
 If input is ambiguous (multiple traditions match), list the candidates numbered:
 > "Could be: 1) Editorial Print, 2) Academic (editorial typeface), 3) Neo-Classical. Reply with a number or a more specific name."
 
-Once locked: set `TRADITION` in state, proceed to Step 2 (Color).
+Once locked: set `TRADITION` in state, proceed to Step 3d.
+
+### Step 3d — Calibrate with current references (optional but recommended)
+
+Traditions are a stable grammar. The web has current examples. Combining the two gives you a library that never ages.
+
+After `TRADITION` locks (and before presenting the Color/Type steps), fire 1-2 `WebSearch` queries targeting current real-world examples of this tradition. Good patterns:
+
+- `"<tradition name> web design 2026 examples"`
+- `"<tradition name> <artifact type> current trends"` (e.g., "editorial landing page current trends", "neo-brutalist SaaS site 2026")
+- For SVG mode: `"<tradition> icon set current"` or `"<tradition> icons 2026"`
+
+From the results, extract 1-3 concrete calibration signals:
+
+- **Shifted accent hue** — is the current wave of this tradition trending warmer/cooler/more saturated? Capture 1-2 specific hex values from the examples.
+- **Updated font weight or pairing** — did current examples swap the library's default for something fresher (e.g., Fraunces variable axis set to 144 instead of 96, or paired with Inter Tight instead of Inter)?
+- **Trending treatment** — a new signature move the tradition is doing right now (e.g., current Editorial Print examples using big italic pull quotes; current Neo-Brutalist adding subtle grain behind offset shadows).
+
+Store these as `CALIBRATION` in state alongside `TRADITION`. They'll show up in downstream decisions as a "2026 current" variant.
+
+**Skip this step if:**
+- Web is unavailable (offline, tool error)
+- User said `use library defaults` or `skip calibration` at any prior step
+- The tradition is intentionally era-specific and shouldn't track trends (Art Deco, Academic, Neon Terminal — these are stable by definition)
+
+Don't let this step add more than ~5 seconds of latency. One search, extract, move on. If the search returns nothing useful, skip silently — the library defaults are still fine.
 
 ---
 
@@ -233,23 +258,23 @@ All four of these steps use the **A/B/C/D pattern** (standard thinking-skill con
 
 ### Step 2 — Color
 
-Given `TRADITION`, offer 4 color variants that stay within the tradition's ramp but shift emphasis:
+Given `TRADITION` (and optionally `CALIBRATION` from Step 3d), offer 4 color variants:
 
-- **Option A: Faithful** — the tradition's default ramp + accent as specified
-- **Option B: Warmer** — shift accents toward warmer hues (wood, brick, amber)
-- **Option C: Cooler** — shift accents toward cooler hues (navy, forest, slate)
-- **Option D: Higher contrast** — pump the contrast between text and background one step
+- **Option A: Faithful** — the tradition's default ramp + accent as specified by the library.
+- **Option B: 2026 current** (when `CALIBRATION` has color signal) — the tradition's ramp with the calibration's shifted accent hue applied. Label this option explicitly: "Pulled from current [tradition] examples on the web." *Fall back to "Warmer" (shift accents toward wood/brick/amber) if no calibration was gathered.*
+- **Option C: Cooler** — shift accents toward cooler hues (navy, forest, slate). Always available.
+- **Option D: Higher contrast** — pump the contrast between text and background one step. Always available.
 
 Render each option as a mini-frame with the tradition's structure (browser chrome, header, hero headline, CTA button) using the shifted palette. Write `.decisions/visual-design/02-color.html`. Open. Wait.
 
 ### Step 3 — Type
 
-Given `TRADITION` + `COLOR`, offer 4 type treatments:
+Given `TRADITION` + `COLOR` (and optionally `CALIBRATION`), offer 4 type treatments:
 
-- **Option A: Tradition default** — the headline + body pair specified by the tradition (recommended)
-- **Option B: Bigger headlines** — same fonts, one scale step larger on h1/h2
-- **Option C: Alternate pair** — the tradition's alternate typeface suggestion (e.g., for Editorial, swap Fraunces display for Source Serif display)
-- **Option D: Mono everything** — replace body with a monospace stack (good for technical feel)
+- **Option A: Tradition default** — the headline + body pair specified by the tradition (recommended when no calibration).
+- **Option B: 2026 current** (when `CALIBRATION` has type signal) — updated font weight / pairing pulled from current examples of this tradition. Label: "Pulled from current [tradition] examples on the web." *Fall back to "Bigger headlines" (same fonts, one scale step up on h1/h2) if no calibration.*
+- **Option C: Alternate pair** — the tradition's alternate typeface suggestion (e.g., for Editorial, swap Fraunces display for Source Serif display).
+- **Option D: Mono everything** — replace body with a monospace stack (good for technical feel).
 
 Each preview shows a styled headline + two lines of body text at realistic sizes. Write, open, wait.
 

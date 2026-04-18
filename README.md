@@ -1,16 +1,8 @@
 # Decision Kit
 
-**Outsource the thinking. Keep the judgment.**
+**AI does the busywork around your decisions. You make the calls.**
 
-<p align="center"><img src="assets/decision-kit-demo.gif" alt="Animated demo of Decision Kit: four cycles showing different prompts being typed into a terminal, decision pages opening in a browser, and users choosing options in varied ways" width="800"></p>
-
-Here's the thing people get wrong about AI: they say "don't outsource the thinking." And yeah, that sounds right. You shouldn't outsource ALL the thinking. The critical thinking is still yours. The part where you look at a set of options and know which one is right because you've been living this problem for months and you understand things the AI never will. That part stays with you. That's the whole point.
-
-But the other kind of thinking? The grunt work of exploring four pricing models, visualizing them, comparing them across six dimensions, pulling together context you'd otherwise spend a week assembling? AI can do that in two minutes. You can't. I can't. Nobody can. And there's no reason to pretend otherwise.
-
-That's the separation that matters. AI does the work around the decision so you can do the part that actually requires you: looking at four options and saying "this one, because it fits who we are." That's judgment. And judgment is yours.
-
-Decision Kit is a system that makes that separation clean. You tell it what you're working on, and it figures out the 5-7 decisions that actually matter, stack-ranked from most critical to least. For each one, AI does all the work *around* the decision: the exploration, the options, the visual comparisons, the tradeoffs. Then it stops and waits for you to make the call. Every decision gets a beautiful visual page you can actually look at and compare. You pick. It remembers. On to the next one, which builds on what you just chose.
+You bring a situation. Decision Kit figures out the 5-7 decisions hiding inside it, stack-ranked from most critical to least. For each one, it does the work *around* the decision: gathers the research, builds the options, renders visual previews, lays out the tradeoffs as a side-by-side comparison. Then it stops and waits for you to make the call. Every decision becomes a real artifact you can open in a browser and compare. You pick. It remembers. On to the next one, which builds on what you just chose.
 
 ```
 /decide I wanna make a tool-sharing app for my neighborhood
@@ -50,7 +42,7 @@ When you're done thinking, you can hand the whole stack of decisions to an AI co
 
 ## The separation that matters
 
-**AI thinks. You judge. Things get built.**
+**AI explores. You judge. Things get built.**
 
 That's the whole idea. When you structure it that way, when the roles are explicit and the handoff is clean, something kind of magical happens. You make decisions in minutes that used to take days. The decisions themselves get better because you can see them, compare them, and revisit them months later. And nothing gets lost.
 

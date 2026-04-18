@@ -22,6 +22,37 @@ The user invokes `/visual-design [optional path to .html or .svg]`. Original is 
 
 ---
 
+## AUTO-MODE OVERRIDE (applies if /autodecide was used)
+
+**Detection:** Check `$ARGUMENTS` for a directive that looks like `[Auto directive: ...]`. If present, your behavior changes for this entire run — apply the rules below across every phase.
+
+**What changes:**
+
+1. **Per-decision pauses are skipped.** For each aesthetic decision in your flow (HTML mode: Tradition → Color → Type → Mood → Flourish; SVG mode: Tradition → Stroke → Color): generate the full HTML decision page exactly as normal — option previews using the actual tradition's tokens, recommendation, comparison. Save it. Record the decision in `.decisions/decisions.json` (or your equivalent decision log) with `status: "auto-picked"` and `chosen` set to the recommended option (capture the recommendation reasoning in the `reasoning` field, prefixed with "Auto-picked: "). Do NOT `open` the file. Do NOT pause. Immediately proceed to the next decision.
+
+2. **Generate `.decisions/auto-review.html` after all aesthetic decisions are picked.** This is the ONE pause point in auto mode. A single page listing every auto-picked aesthetic decision in a scannable layout. For each row, show: decision number, decision title (e.g. "Tradition", "Color"), the chosen option (label + summary or token preview), the other options as one-line summaries, and the AI's reasoning. Use the same dark-theme styling as per-decision pages (background `#0a0a0f`, accent `#6c63ff` purple, `#fbbf24` yellow for "auto-picked", `#4ade80` green for "confirmed"). Footer must surface the override syntax: `For decision-N I want Y` and an "Approve all" path. Open it with `open .decisions/auto-review.html`.
+
+3. **Tell the user.** Output: "Auto-picked all N aesthetic decisions. Review at .decisions/auto-review.html. Confirm with 'looks good' or override with 'For decision-N I want Y'."
+
+4. **Wait for the user's response.** This is the only pause in auto mode.
+
+**On user response:**
+
+- **"Looks good" / "Confirm" / "Approved" / similar** → Transition every `auto-picked` decision to `status: "chosen"`. Update the auto-review page rows to the green "confirmed" state. Then proceed to the styled-file generation step normally — apply all chosen tokens, write `<name>.styled.html` or `<name>.styled.svg` and `tokens.json`, and open the result.
+- **"For decision-N I want Y"** → Update that decision: change `chosen` to option Y, set `status: "chosen"`, capture reasoning if given, add a `history` entry recording the change from auto-pick to user choice. Regenerate `auto-review.html`. Re-prompt for confirmation of the remaining auto-picks. Repeat until the user confirms.
+- **"Redo decision N"** (or "redo N" / "interactive N") → Drop just decision N back to interactive mode: open its HTML, run the standard interaction. After they pick, return to the auto-review pause for the rest.
+- **Custom answer** → Standard custom-answer handling: generate a custom option card (or use the user's named tradition/color/etc.), regenerate auto-review.
+
+**Note on Tradition and Flourish:** these decisions don't follow the strict 4-option pattern (they use top-3-matched + catalog/library). In auto mode, auto-pick the **top match** (the highest-ranked recommendation) for each. The user can still override to any catalog item via the standard syntax.
+
+**Note on depth directives:** visual-design has a fixed decision count per mode (5 for HTML, 3 for SVG), so any `[Depth directive: ...]` from `/overdecide` or `/underdecide` does not apply here — auto-mode runs the standard count.
+
+**Schema:** `auto-picked` is a third valid value for the `status` field, alongside `pending` and `chosen`. The styled file must not be written until every aesthetic decision has transitioned from `auto-picked` to `chosen`.
+
+**Critical invariant:** Do NOT write the styled file (`.styled.html`/`.styled.svg`) or `tokens.json` until every decision has transitioned from `auto-picked` to `chosen`. The batch-review pause is the gate.
+
+---
+
 ## PHASE 1 — Invocation
 
 ### Step 1a — Parse the argument + detect mode

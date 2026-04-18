@@ -66,6 +66,7 @@ Use the exact same skill profiles as `/decide`. The routing logic is identical. 
 **Other skills** (these don't benefit from a decision count directive, but route them like `/decide` would):
 
 - `/self-code-review`, `/journal`, `/state-your-case`, `/excavate` — still route, but you can omit the depth directive since they don't walk through a variable number of decisions
+- `/visual-design` — also route normally, but omit the depth directive: it has a fixed decision count per mode (5 for HTML, 3 for SVG). Auto-mode applies (via `/autodecide`), but depth modifiers don't.
 - Action skills (`/game-plan`, `/product-plan`, `/brief`, `/challenge`, `/observe`, `/investigate`) — route, but they don't present decision points, so omit the directive
 
 ---

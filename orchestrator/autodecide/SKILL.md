@@ -65,6 +65,7 @@ Use the exact same skill profiles as `/decide`. The routing logic is identical. 
 - `/product-design` — product "how" (tech + UX)
 - `/ticket-breakdown` — ticket to implementation plan
 - `/core-principles` — tension-based principles
+- `/visual-design` — aesthetic re-skin (auto-picks tradition/color/type/mood/flourish)
 
 **Other skills** (auto-mode doesn't apply, but route them like `/decide` would):
 
@@ -112,7 +113,7 @@ Same as `/decide`. The only difference is that when you route to a thinking skil
 ## Important Rules
 
 1. **You are /decide with an auto-pick knob.** Classification is identical. Only the args change.
-2. **Only inject the auto directive for thinking skills that walk decisions.** /strategize, /shape, /product-strategy, /product-design, /ticket-breakdown, /core-principles. For everything else, route normally.
+2. **Only inject the auto directive for thinking skills that walk decisions.** /strategize, /shape, /product-strategy, /product-design, /ticket-breakdown, /core-principles, /visual-design. For everything else, route normally.
 3. **The auto-pick is the *recommended* option, not a random pick.** Downstream skills already produce a recommendation per decision; auto-mode just commits to it.
 4. **Batch review is non-negotiable.** The auto directive REQUIRES the downstream skill to pause once at the end with `auto-review.html`. The action skill must not run until the user confirms.
 5. **Preserve the user's words.** Put the auto directive AFTER their input, not mixed into it.

@@ -54,6 +54,37 @@ Example:
 
 ---
 
+## AUTO-MODE OVERRIDE (applies if /autodecide was used)
+
+**Detection:** Check `$ARGUMENTS` for a directive that looks like `[Auto directive: ...]`. If present, your behavior changes for this entire run — apply the rules below across every phase.
+
+**What changes:**
+
+1. **Per-tenet pauses are skipped.** For each tenet decision: generate the full HTML page exactly as normal — research, 4 options, recommendation, comparison table, footer. Save it. Record the decision in `decisions.json` with `status: "auto-picked"` and `chosen` set to the recommended tenet (capture the recommendation reasoning in the `reasoning` field, prefixed with "Auto-picked: "). Do NOT `open` the file. Do NOT pause. Immediately proceed to the next tenet.
+
+2. **Generate `.decisions/auto-review.html` after all tenets.** This is the ONE pause point in auto mode. A single page listing every auto-picked tenet in a scannable layout. For each row, show: tenet number, the tension being resolved, the chosen "X over Y" stance (label + summary), the other options as one-line summaries, and the AI's reasoning. Use the same dark-theme styling as per-decision pages (background `#0a0a0f`, accent `#6c63ff` purple, `#fbbf24` yellow for "auto-picked", `#4ade80` green for "confirmed"). Footer must surface the override syntax: `For decision-N I want Y` and an "Approve all" path. Open it with `open .decisions/auto-review.html`.
+
+3. **Tell the user.** Output: "Auto-picked all N tenets. Review at .decisions/auto-review.html. Confirm with 'looks good' or override with 'For decision-N I want Y'."
+
+4. **Wait for the user's response.** This is the only pause in auto mode.
+
+**On user response:**
+
+- **"Looks good" / "Confirm" / "Approved" / similar** → Transition every `auto-picked` tenet in `decisions.json` to `status: "chosen"`. Update the auto-review page rows to the green "confirmed" state. Then proceed to the principles document / next-action phase normally.
+- **"For decision-N I want Y"** → Update that tenet: change `chosen` to option Y, set `status: "chosen"`, capture reasoning if given, add a `history` entry recording the change from auto-pick to user choice. Regenerate `auto-review.html`. Re-prompt for confirmation of the remaining auto-picks. Repeat until the user confirms.
+- **"Redo decision N"** → Drop just decision N back to interactive mode: open its HTML, run the standard interaction. After they pick, return to the auto-review pause for the rest.
+- **Custom answer** → Standard custom-answer handling: generate a custom option card, set `chosenOption: "custom"`, regenerate auto-review.
+
+**Depth directives compose with auto-mode.** If `$ARGUMENTS` ALSO contains a `[Depth directive: ...]` (from `/overdecide` or `/underdecide` chained with `/autodecide`), apply both: surface the requested tenet count AND auto-pick all of them.
+
+**Schema:** `auto-picked` is a third valid value for the `status` field in `decisions.json`, alongside `pending` and `chosen`. Action skills must treat only `chosen` as ready to consume.
+
+**Critical invariant:** Do NOT finalize the principles document or hand off to a downstream skill until every tenet has transitioned from `auto-picked` to `chosen`. The batch-review pause is the gate.
+
+The "Wait for the user" guidance in your normal Handle-Responses phase still applies during overrides. But during auto mode, you do not pause per tenet — only at auto-review.
+
+---
+
 ## PHASE 1 -- Understand the Idea
 
 Read `$ARGUMENTS` carefully.

@@ -29,6 +29,27 @@ This skill behaves exactly like `/decide`:
 
 ---
 
+## CHAIN HANDLING
+
+This orchestrator can be chained with `/autodecide` (or `/decide`). The user might write:
+
+- `/underdecide /autodecide [topic]` — fewer decisions AND auto-pick (2-3 decisions, all auto-picked)
+- `/autodecide /underdecide [topic]` — same, order-agnostic
+
+**If `$ARGUMENTS` begins with another orchestrator's slash command from this family (`/decide`, `/underdecide`, `/overdecide`, `/autodecide`):**
+
+1. Strip that leading slash command from the args.
+2. Treat it as if both orchestrators were invoked. When routing to the downstream skill, append BOTH directives — your depth directive AND the chained orchestrator's directive.
+3. In your "routing to..." note, mention both modes (e.g., "routing to /strategize with less depth AND auto-pick").
+
+**Mutually exclusive:** `/underdecide` and `/overdecide` can't be combined. If the user chains both, prefer the FIRST one mentioned and tell them you're ignoring the second.
+
+The other directive to merge if `/autodecide` is chained:
+
+- From `/autodecide`: `[Auto directive: the user invoked /autodecide. Run all decisions end-to-end without pausing per decision. For each decision, generate the full HTML page (research, options, recommendation) but DO NOT open it and DO NOT wait for input — record the recommended option as the choice with status "auto-picked" in decisions.json, then immediately move to the next decision. After all decisions and the elevator pitch are auto-picked, generate .decisions/auto-review.html (a single batch-review page listing every auto-pick with chosen option, alternatives, and reasoning), open it, and pause ONCE for confirm/override. Use the standard "For decision-N I want Y" syntax for overrides. On confirm, transition every "auto-picked" decision to "chosen" before proceeding to the brief and the action-skill prompt.]`
+
+---
+
 ## Step 1: Classify the Input
 
 Use the exact same skill profiles as `/decide`. The routing logic is identical. Only the args sent to the downstream skill change.

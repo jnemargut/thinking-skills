@@ -136,6 +136,46 @@ The real test: run an existing thinking skill first (like `/strategize`), then r
 
 If yes, your thinking skill composes. It works with every other thinking skill in the ecosystem.
 
+## Step 5: Add Auto-Mode Support (Recommended)
+
+Auto-Mode lets users run your skill end-to-end without per-decision pauses, then review all the AI's picks at once. It's how `/autodecide [topic]` (which routes through your skill) and `/your-skill /autodecide [topic]` (direct inline modifier) work. See [SPEC.md → Auto-Mode](../SPEC.md#auto-mode) for the full spec.
+
+To support Auto-Mode, add a single block to your SKILL.md between your Core Principles and PHASE 1:
+
+````markdown
+## AUTO-MODE OVERRIDE (applies if /autodecide was used)
+
+**Detection:** Auto-mode applies if EITHER:
+
+- `$ARGUMENTS` contains a `[Auto directive: ...]` block (injected by the `/autodecide` orchestrator), OR
+- `$ARGUMENTS` starts with `/autodecide` (direct inline modifier)
+
+In the second case, strip `/autodecide` from the args before treating the rest as the user's input.
+
+**Inline depth modifiers also work.** If `$ARGUMENTS` starts with (or contains alongside `/autodecide`) `/overdecide` or `/underdecide`, treat them as depth directives too:
+- `/overdecide` → surface 8-12 decisions instead of the usual 4-7
+- `/underdecide` → surface only 2-3 decisions
+- Order doesn't matter; if both depth modifiers appear, the FIRST wins
+
+Strip all leading modifier tokens before treating the rest as the user's input.
+
+If auto-mode is triggered, your behavior changes:
+
+1. **Per-decision pauses are skipped.** Generate every decision page as normal (research, options, recommendation, comparison) but record `status: "auto-picked"` in `decisions.json` with `chosen` set to the recommendation (capture reasoning in the `reasoning` field, prefixed with "Auto-picked: "). Do NOT open the file. Do NOT pause. Move to the next decision.
+2. **Generate `.decisions/auto-review.html`** after all decisions: a single batch-review page listing every auto-pick with the chosen option, the alternatives it beat, and the reasoning. Open it.
+3. **Pause once** for confirm/override.
+4. **On confirm** ("looks good", "approved"): transition every `auto-picked` decision to `status: "chosen"`, then continue to your summary phase normally.
+5. **On override** ("For decision-N I want Y"): update that decision (set `chosen` to Y, `status: "chosen"`, capture reasoning if given, add a `history` entry), regenerate `auto-review.html`, re-prompt for confirmation of the rest.
+
+**Critical invariant:** Do not generate the summary brief or hand off to action skills until every decision has transitioned from `auto-picked` to `chosen`. The batch-review pause is the gate.
+````
+
+Copy-paste this into your SKILL.md. Tweak the wording ("user's input" → "user's project" / "engineer's ticket" / etc.) to match your domain.
+
+**Test it:** Run `/your-skill /autodecide [example input]`. It should generate every decision page without pausing, then open `auto-review.html`. Reply "looks good" and verify it proceeds to your summary phase. Try `/your-skill /autodecide /overdecide [input]` for the chained case (more decisions, all auto-picked).
+
+**Skip Auto-Mode if:** your skill doesn't follow the "AI recommends, human picks from N options" pattern — for example, skills that surface findings the human verifies (`/excavate`), skills where the human leads (`/journal`), or skills designed to interrupt and ask (`/state-your-case`). Auto-Mode doesn't fit those paradigms.
+
 ## Tips
 
 - **Start with 4-7 decisions.** Too few feels shallow. Too many feels tedious.
